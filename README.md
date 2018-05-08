@@ -1,2 +1,4 @@
 # slack-client-php
-Symfony client for Slack comms using PHP
+Composer client for Slack comms using PHP
+
+This project is still being instantiated. 
