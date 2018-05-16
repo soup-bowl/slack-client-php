@@ -28,36 +28,50 @@ class botclient {
 	 * Posts a quick message via the chat API. If a timestamp is provided, it will update that message.
 	 * @param string $message
 	 * @param string|boolean $ts
-	 * @return stdClass
+	 * @return string|boolean message timestamp, or false on error
 	 */
 	public function message($message, $ts = false) {
+		$response = false;
 		if (!$ts) {
 			// New message.
-			return $this->client->sendRequest('chat.postMessage', [
+			$response = $this->client->sendRequest('chat.postMessage', [
 				'channel'    => $this->channel,
 				'text'       => $message,
 				'link_names' => 1
 			]);
 		} else {
 			// Edit previous message.
-			return $this->client->sendRequest('chat.update', [
+			$response = $this->client->sendRequest('chat.update', [
 				'ts'         => $ts,
 				'channel'    => $this->channel,
 				'text'       => $message,
 				'link_names' => 1
 			]);
 		}
+		
+		if ($response !== false) {
+			return $response['ts'];
+		} else {
+			return false;
+		}
 	}
 	
 	/**
 	 * Deletes a message the bot user has posted.
 	 * @param string $ts
+	 * @return boolean
 	 */
 	public function deleteMessage($ts) {
-		return $this->client->sendRequest('chat.delete', [
+		$response = $this->client->sendRequest('chat.delete', [
 			'ts'      => $ts,
 			'channel' => $this->channel
 		]);
+		
+		if ($response['ok'] === true) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -87,10 +101,7 @@ class botclient {
 	 * @param string $ts 
 	 */
 	public function pin($ts) {
-		return $this->client->sendRequest('pins.add', [
-			'channel' => $this->channel,
-			'timestamp' => $ts
-		]);
+		return $this->pinModifier($ts, 'add');
 	}
 	
 	/**
@@ -98,10 +109,7 @@ class botclient {
 	 * @param string $ts 
 	 */
 	public function unpin($ts) {
-		return $this->client->sendRequest('pins.remove', [
-			'channel' => $this->channel,
-			'timestamp' => $ts
-		]);
+		return $this->pinModifier($ts, 'remove');
 	}
 	
 	/**
@@ -109,5 +117,18 @@ class botclient {
 	 */
 	public function test() {
 		return $this->client->sendRequest('api.test');
+	}
+	
+	private function pinModifier($ts, $state) {
+		$response = $this->client->sendRequest("pins.{$state}", [
+			'channel' => $this->channel,
+			'timestamp' => $ts
+		]);
+		
+		if ($response['ok'] === true) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
