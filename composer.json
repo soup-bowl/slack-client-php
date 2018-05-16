@@ -1,0 +1,15 @@
+{
+    "name": "soup-bowl/slack-client-php",
+    "description": "A simple Slack client for PHP.",
+    "license": "MIT",
+    "homepage": "https://github.com/soup-bowl/slack-client-php",
+    "require": {
+        "php": "^7.0",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "SlackClient\\": "comms/"
+        }
+    }
+}
