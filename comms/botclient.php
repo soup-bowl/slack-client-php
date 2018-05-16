@@ -9,7 +9,7 @@ class botclient {
 	protected $channel;
 	protected $client;
 	public function __construct($token, $channel) {
-		$this->client = new communication();
+		$this->client = new communication($token);
 		
 		$this->token   = $token;
 		
@@ -33,14 +33,14 @@ class botclient {
 	public function message($message, $ts = false) {
 		if (!$ts) {
 			// New message.
-			return $this->client->sendRequest($this->token, 'chat.postMessage', [
+			return $this->client->sendRequest('chat.postMessage', [
 				'channel'    => $this->channel,
 				'text'       => $message,
 				'link_names' => 1
 			]);
 		} else {
 			// Edit previous message.
-			return $this->client->sendRequest($this->token, 'chat.update', [
+			return $this->client->sendRequest('chat.update', [
 				'ts'         => $ts,
 				'channel'    => $this->channel,
 				'text'       => $message,
@@ -54,7 +54,7 @@ class botclient {
 	 * @param string $ts
 	 */
 	public function deleteMessage($ts) {
-		return $this->client->sendRequest($this->token, 'chat.delete', [
+		return $this->client->sendRequest('chat.delete', [
 			'ts'      => $ts,
 			'channel' => $this->channel
 		]);
@@ -69,7 +69,7 @@ class botclient {
 	public function identifyChannel($name, $public = true) {
 		$branding = ($public) ? 'channels' : 'groups';
 		
-		$cl = $this->client->sendRequest($this->token, "{$branding}.list", [
+		$cl = $this->client->sendRequest("{$branding}.list", [
 			'exclude_archived' => true
 		]);
 		
@@ -83,9 +83,31 @@ class botclient {
 	}
 	
 	/**
+	 * Pin the specified timestamp message to the chat.
+	 * @param string $ts 
+	 */
+	public function pin($ts) {
+		return $this->client->sendRequest('pins.add', [
+			'channel' => $this->channel,
+			'timestamp' => $ts
+		]);
+	}
+	
+	/**
+	 * Pin the specified timestamp message to the chat.
+	 * @param string $ts 
+	 */
+	public function unpin($ts) {
+		return $this->client->sendRequest('pins.remove', [
+			'channel' => $this->channel,
+			'timestamp' => $ts
+		]);
+	}
+	
+	/**
 	 * Tests the Slack API. Normally replies with ok.
 	 */
 	public function test() {
-		return $this->client->sendRequest($this->token, 'api.test');
+		return $this->client->sendRequest('api.test');
 	}
 }
