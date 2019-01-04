@@ -117,6 +117,27 @@ class botclient {
 	}
 	
 	/**
+	 * React to the specified message. Needs to be a Slack code name, without colons.
+	 *
+	 * @param string $ts
+	 * @param string $emoji
+	 * @return boolean
+	 */
+	public function react($ts, $emoji = 'thumbsup') {
+		$response = $this->client->sendRequest("reactions.add", [
+			'name'      => $emoji,
+			'channel'   => $this->channel,
+			'timestamp' => $ts
+		]);
+		
+		if ($response['ok'] === true) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
 	 * Tests the Slack API. Normally replies with ok.
 	 */
 	public function test() {
