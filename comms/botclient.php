@@ -12,10 +12,22 @@ class botclient {
 	protected $token;
 	protected $channel;
 	protected $client;
-	public function __construct($token, $channel) {
+	public function __construct($token = null, $channel = null) {
+		if ( isset( $token, $channel ) ) {
+			$this->connect($token, $channel);
+		}
+	}
+
+	/**
+	 * Connects to the Slack system with the access token, and with a specified comms channel.
+	 *
+	 * @param string $token
+	 * @param string $channel Field ID (recommended) or literal.
+	 * @return this
+	 */
+	public function connect($token, $channel) {
 		$this->client = new communication($token);
-		
-		$this->token   = $token;
+		$this->token  = $token;
 		
 		// If the user designates the channel field with a literal, find the ID.
 		//
@@ -26,6 +38,8 @@ class botclient {
 		}else {
 			$this->channel = $channel;
 		}
+		
+		return $this;
 	}
 	
 	/**
