@@ -46,25 +46,28 @@ class botclient {
 	 * Posts a quick message via the chat API. If a timestamp is provided, it will update that message.
 	 * @param string $message
 	 * @param string|boolean $ts
+	 * @param string|boolean $threadts
 	 * @return string|boolean message timestamp, or false on error
 	 */
-	public function message($message, $ts = false) {
+	public function message($message, $ts = false, $threadts = false) {
 		$response = false;
+		$args     = [
+			'channel'    => $this->channel,
+			'text'       => $message,
+			'link_names' => 1
+		];
+		
+		if ($threadts !== false) {
+				$args['thread_ts'] = $threadts;
+			}
+
 		if (!$ts) {
 			// New message.
-			$response = $this->client->sendRequest('chat.postMessage', [
-				'channel'    => $this->channel,
-				'text'       => $message,
-				'link_names' => 1
-			]);
+			$response = $this->client->sendRequest('chat.postMessage', $args );
 		} else {
 			// Edit previous message.
-			$response = $this->client->sendRequest('chat.update', [
-				'ts'         => $ts,
-				'channel'    => $this->channel,
-				'text'       => $message,
-				'link_names' => 1
-			]);
+			$args['ts'] = $ts;
+			$response = $this->client->sendRequest('chat.update', $args );
 		}
 		
 		if ($response !== false) {
@@ -128,6 +131,27 @@ class botclient {
 	 */
 	public function unpin($ts) {
 		return $this->pinModifier($ts, 'remove');
+	}
+	
+	/**
+	 * React to the specified message. Needs to be a Slack code name, without colons.
+	 *
+	 * @param string $ts
+	 * @param string $emoji
+	 * @return boolean
+	 */
+	public function react($ts, $emoji = 'thumbsup') {
+		$response = $this->client->sendRequest("reactions.add", [
+			'name'      => $emoji,
+			'channel'   => $this->channel,
+			'timestamp' => $ts
+		]);
+		
+		if ($response['ok'] === true) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
