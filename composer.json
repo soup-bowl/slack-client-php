@@ -7,9 +7,17 @@
         "php": "^7.0",
         "guzzlehttp/guzzle": "^6.3"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^8.0"
+    },
     "autoload": {
         "psr-4": {
             "SlackClient\\": "comms/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SlackClientTest\\": "tests/"
         }
     }
 }

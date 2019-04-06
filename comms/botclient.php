@@ -25,8 +25,8 @@ class botclient {
 	 * @param string $channel Field ID (recommended) or literal.
 	 * @return this
 	 */
-	public function connect($token, $channel) {
-		$this->client = new communication($token);
+	public function connect($token, $channel, $handler = null) {
+		$this->client = new communication($token, false, $handler);
 		$this->token  = $token;
 		
 		// If the user designates the channel field with a literal, find the ID.

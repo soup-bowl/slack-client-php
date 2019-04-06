@@ -1,0 +1,39 @@
+{
+    "ok": true,
+    "channels": [
+        {
+            "id": "C0G9QKBBL",
+            "name": "general",
+            "is_channel": true,
+            "created": 1449709280,
+            "creator": "U0G9QF9C6",
+            "is_archived": false,
+            "is_general": true,
+            "name_normalized": "general",
+            "is_shared": false,
+            "is_org_shared": false,
+            "is_member": true,
+            "is_private": false,
+            "is_mpim": false,
+            "members": [
+                "U0G9QF9C6",
+                "U0G9WFXNZ"
+            ],
+            "topic": {
+                "value": "Talk about anything!",
+                "creator": "U0G9QF9C6",
+                "last_set": 1449709364
+            },
+            "purpose": {
+                "value": "To talk about anything!",
+                "creator": "U0G9QF9C6",
+                "last_set": 1449709334
+            },
+            "previous_names": [],
+            "num_members": 2
+        }
+    ],
+    "response_metadata": {
+        "next_cursor": "dGVhbTpDMUg5UkVTR0w="
+    }
+}

@@ -5,9 +5,11 @@ use GuzzleHttp\Client;
 class communication {
 	protected $token;
 	protected $channel;
-	public function __construct($token, $channel = false) {
-		$this->token   = $token;
-		$this->channel = $channel;
+	protected $custom_handler;
+	public function __construct($token, $channel = false, $custom_handler = null) {
+		$this->token          = $token;
+		$this->channel        = $channel;
+		$this->custom_handler = $custom_handler;
 	}
 	/**
 	 * Sends a CURL request to the Slack API, using application/x-www-form-urlencoded.
@@ -23,7 +25,12 @@ class communication {
 			$args['channel'] = $this->channel;
 		}
 		
-		$client   = new Client(['base_uri' => 'https://slack.com/api/']);
+		$args = ['base_uri' => 'https://slack.com/api/'];
+		if ( isset( $this->custom_handler ) ) {
+			$args['handler'] = $this->custom_handler;
+		}
+
+		$client   = new Client( $args );
 		$response = $client->request($type, $slackapi, [
 			'form_params' => $args
 		]);
