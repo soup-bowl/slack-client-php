@@ -1,19 +1,21 @@
 <?php namespace SlackClient;
 
-if (file_exists(__DIR__.'/../vendor/autoload.php')) {
-	require(__DIR__.'/../vendor/autoload.php');
-} else {
-	require(__DIR__.'/../../../autoload.php');
-}
+use SlackClient\Communication;
 
-use SlackClient\communication;
-
-class botclient {
+class BotClient
+{
 	protected $token;
 	protected $channel;
 	protected $client;
-	public function __construct($token = null, $channel = null) {
-		if ( isset( $token, $channel ) ) {
+	public function __construct($token = null, $channel = null)
+	{
+		if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+			require_once __DIR__ . '/../vendor/autoload.php';
+		} else {
+			require_once __DIR__ . '/../../../autoload.php';
+		}
+
+		if (isset($token, $channel)) {
 			$this->connect($token, $channel);
 		}
 	}
@@ -25,8 +27,9 @@ class botclient {
 	 * @param string $channel Field ID (recommended) or literal.
 	 * @return this
 	 */
-	public function connect($token, $channel, $handler = null) {
-		$this->client = new communication($token, false, $handler);
+	public function connect($token, $channel = null, $handler = null)
+	{
+		$this->client = new Communication($token, null, $handler);
 		$this->token  = $token;
 		
 		// If the user designates the channel field with a literal, find the ID.
@@ -35,7 +38,7 @@ class botclient {
 		// to avoid hitting the rate limit for numerous requests.
 		if ($channel[0] == '#') {
 			$this->channel = $this->identifyChannel(substr($channel, 1));
-		}else {
+		} else {
 			$this->channel = $channel;
 		}
 		
@@ -49,7 +52,8 @@ class botclient {
 	 * @param string|boolean $threadts
 	 * @return string|boolean message timestamp, or false on error
 	 */
-	public function message($message, $ts = false, $threadts = false) {
+	public function message($message, $ts = false, $threadts = false)
+	{
 		$response = false;
 		$args     = [
 			'channel'    => $this->channel,
@@ -59,15 +63,15 @@ class botclient {
 		
 		if ($threadts !== false) {
 				$args['thread_ts'] = $threadts;
-			}
+		}
 
 		if (!$ts) {
 			// New message.
-			$response = $this->client->sendRequest('chat.postMessage', $args );
+			$response = $this->client->sendRequest('chat.postMessage', $args);
 		} else {
 			// Edit previous message.
 			$args['ts'] = $ts;
-			$response = $this->client->sendRequest('chat.update', $args );
+			$response = $this->client->sendRequest('chat.update', $args);
 		}
 		
 		if ($response !== false) {
@@ -82,7 +86,8 @@ class botclient {
 	 * @param string $ts
 	 * @return boolean
 	 */
-	public function deleteMessage($ts) {
+	public function deleteMessage($ts)
+	{
 		$response = $this->client->sendRequest('chat.delete', [
 			'ts'      => $ts,
 			'channel' => $this->channel
@@ -101,7 +106,8 @@ class botclient {
 	 * @param string $name channel name, without preceeding symbol
 	 * @param boolean $public Is the channel a group?
 	 */
-	public function identifyChannel($name, $public = true) {
+	public function identifyChannel($name, $public = true)
+	{
 		$branding = ($public) ? 'channels' : 'groups';
 		
 		$cl = $this->client->sendRequest("{$branding}.list", [
@@ -119,17 +125,19 @@ class botclient {
 	
 	/**
 	 * Pin the specified timestamp message to the chat.
-	 * @param string $ts 
+	 * @param string $ts
 	 */
-	public function pin($ts) {
+	public function pin($ts)
+	{
 		return $this->pinModifier($ts, 'add');
 	}
 	
 	/**
 	 * Pin the specified timestamp message to the chat.
-	 * @param string $ts 
+	 * @param string $ts
 	 */
-	public function unpin($ts) {
+	public function unpin($ts)
+	{
 		return $this->pinModifier($ts, 'remove');
 	}
 	
@@ -140,7 +148,8 @@ class botclient {
 	 * @param string $emoji
 	 * @return boolean
 	 */
-	public function react($ts, $emoji = 'thumbsup') {
+	public function react($ts, $emoji = 'thumbsup')
+	{
 		$response = $this->client->sendRequest("reactions.add", [
 			'name'      => $emoji,
 			'channel'   => $this->channel,
@@ -157,11 +166,13 @@ class botclient {
 	/**
 	 * Tests the Slack API. Normally replies with ok.
 	 */
-	public function test() {
+	public function test()
+	{
 		return $this->client->sendRequest('api.test');
 	}
 	
-	private function pinModifier($ts, $state) {
+	private function pinModifier($ts, $state)
+	{
 		$response = $this->client->sendRequest("pins.{$state}", [
 			'channel' => $this->channel,
 			'timestamp' => $ts
