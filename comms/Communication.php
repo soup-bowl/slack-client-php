@@ -28,7 +28,7 @@ class Communication
 			$args['channel'] = $this->channel;
 		}
 		
-		$args = ['base_uri' => 'https://slack.com/api/'];
+		$args['base_uri'] = 'https://slack.com/api/';
 		if (isset($this->custom_handler)) {
 			$args['handler'] = $this->custom_handler;
 		}
