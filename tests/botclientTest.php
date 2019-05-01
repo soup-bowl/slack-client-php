@@ -19,20 +19,20 @@ class BotClientTest extends TestCase
 	public function testFullCycularApproach()
 	{
 		$json_dir = __DIR__ . '/json';
-		$client   = new BotClient();
-		$client->connect(
-			'xorg-abc-0123456789',
-			'#general',
-			HandlerStack::create(
-				new MockHandler([
-					new Response(200, [], file_get_contents("{$json_dir}/channels.json")),
-					new Response(200, [], file_get_contents("{$json_dir}/postmessage.json")),
-					new Response(200, [], file_get_contents("{$json_dir}/update.json")),
-					new Response(200, [], "{\"ok\": true}"),
-					new Response(200, [], file_get_contents("{$json_dir}/delete.json")),
-				])
-			)
+		$handler  = HandlerStack::create(
+			new MockHandler([
+				new Response(200, [], file_get_contents("{$json_dir}/channels.json")),
+				new Response(200, [], file_get_contents("{$json_dir}/postmessage.json")),
+				new Response(200, [], file_get_contents("{$json_dir}/update.json")),
+				new Response(200, [], "{\"ok\": true}"),
+				new Response(200, [], file_get_contents("{$json_dir}/delete.json")),
+			])
 		);
+			
+		
+		$client = new BotClient('xorg-abc-0123456789', $handler);
+		$client->setChannel('#general');
+
 		$resp_01 = $client->message('This is a test message.');
 		$resp_02 = $client->message('This is an updated message.', $resp_01);
 		$resp_03 = $client->pin($resp_02);

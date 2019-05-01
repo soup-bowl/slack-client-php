@@ -5,9 +5,10 @@ use SlackClient\Communication;
 class BotClient
 {
 	protected $token;
-	protected $channel;
+	protected $handler;
 	protected $client;
-	public function __construct($token = null, $channel = null)
+	protected $channel;
+	public function __construct($token = null, $handler = null)
 	{
 		if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 			require_once __DIR__ . '/../vendor/autoload.php';
@@ -15,23 +16,32 @@ class BotClient
 			require_once __DIR__ . '/../../../autoload.php';
 		}
 
-		if (isset($token, $channel)) {
-			$this->connect($token, $channel);
-		}
+		$this->connect($token, $handler);
 	}
 
 	/**
 	 * Connects to the Slack system with the access token, and with a specified comms channel.
 	 *
-	 * @param string $token
+	 * @param string $token Bot client oAuth token from Slack.
+	 * @param string $handler   Guzzle client override, for testing purposes.
+	 * @return this
+	 */
+	public function connect($token, $handler = null)
+	{
+		$this->client = new Communication($token, $handler);
+		$this->token  = $token;
+		
+		return $this;
+	}
+
+	/**
+	 * Sets the channel of operation.
+	 *
 	 * @param string $channel Field ID (recommended) or literal.
 	 * @return this
 	 */
-	public function connect($token, $channel = null, $handler = null)
+	public function setChannel($channel)
 	{
-		$this->client = new Communication($token, null, $handler);
-		$this->token  = $token;
-		
 		// If the user designates the channel field with a literal, find the ID.
 		//
 		// Preferable if the user finds this out using identify, then stores this
@@ -41,7 +51,7 @@ class BotClient
 		} else {
 			$this->channel = $channel;
 		}
-		
+
 		return $this;
 	}
 	
@@ -56,7 +66,6 @@ class BotClient
 	{
 		$response = false;
 		$args     = [
-			'channel'    => $this->channel,
 			'text'       => $message,
 			'link_names' => 1
 		];
@@ -67,11 +76,11 @@ class BotClient
 
 		if (!$ts) {
 			// New message.
-			$response = $this->client->sendRequest('chat.postMessage', $args);
+			$response = $this->client->sendRequest('chat.postMessage', $this->channel, $args);
 		} else {
 			// Edit previous message.
 			$args['ts'] = $ts;
-			$response = $this->client->sendRequest('chat.update', $args);
+			$response = $this->client->sendRequest('chat.update', $this->channel, $args);
 		}
 		
 		if ($response !== false) {
@@ -88,10 +97,7 @@ class BotClient
 	 */
 	public function deleteMessage($ts)
 	{
-		$response = $this->client->sendRequest('chat.delete', [
-			'ts'      => $ts,
-			'channel' => $this->channel
-		]);
+		$response = $this->client->sendRequest('chat.delete', $this->channel, ['ts' => $ts]);
 		
 		if ($response['ok'] === true) {
 			return true;
@@ -110,9 +116,7 @@ class BotClient
 	{
 		$branding = ($public) ? 'channels' : 'groups';
 		
-		$cl = $this->client->sendRequest("{$branding}.list", [
-			'exclude_archived' => true
-		]);
+		$cl = $this->client->sendRequest("{$branding}.list", $this->channel, ['exclude_archived' => true]);
 		
 		$bob = array_search($name, array_column($cl[$branding], 'name'));
 		
@@ -150,9 +154,8 @@ class BotClient
 	 */
 	public function react($ts, $emoji = 'thumbsup')
 	{
-		$response = $this->client->sendRequest("reactions.add", [
+		$response = $this->client->sendRequest("reactions.add", $this->channel, [
 			'name'      => $emoji,
-			'channel'   => $this->channel,
 			'timestamp' => $ts
 		]);
 		
@@ -173,10 +176,7 @@ class BotClient
 	
 	private function pinModifier($ts, $state)
 	{
-		$response = $this->client->sendRequest("pins.{$state}", [
-			'channel' => $this->channel,
-			'timestamp' => $ts
-		]);
+		$response = $this->client->sendRequest("pins.{$state}", $this->channel, ['timestamp' => $ts]);
 		
 		if ($response['ok'] === true) {
 			return true;

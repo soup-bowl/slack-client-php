@@ -5,12 +5,10 @@ use GuzzleHttp\Client;
 class Communication
 {
 	protected $token;
-	protected $channel;
 	protected $custom_handler;
-	public function __construct($token, $channel = null, $custom_handler = null)
+	public function __construct($token, $custom_handler = null)
 	{
 		$this->token          = $token;
-		$this->channel        = $channel;
 		$this->custom_handler = $custom_handler;
 	}
 	/**
@@ -21,13 +19,10 @@ class Communication
 	 * @param array $args
 	 * @param string $type HTTP request type
 	 */
-	public function sendRequest($slackapi, $args = [], $type = "POST")
+	public function sendRequest($slackapi, $channel, $args = [], $type = "POST")
 	{
-		$args['token'] = $this->token;
-		if (isset($this->channel)) {
-			$args['channel'] = $this->channel;
-		}
-		
+		$args['token']    = $this->token;
+		$args['channel']  = $channel;
 		$args['base_uri'] = 'https://slack.com/api/';
 		if (isset($this->custom_handler)) {
 			$args['handler'] = $this->custom_handler;
