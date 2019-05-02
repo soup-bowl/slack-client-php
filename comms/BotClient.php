@@ -16,7 +16,9 @@ class BotClient
 			require_once __DIR__ . '/../../../autoload.php';
 		}
 
-		$this->connect($token, $handler);
+		if (isset($token)) {
+			$this->connect($token, $handler);
+		}
 	}
 
 	/**
