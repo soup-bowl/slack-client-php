@@ -56,7 +56,7 @@ class BotClient
 
 		return $this;
 	}
-	
+
 	/**
 	 * Posts a quick message via the chat API. If a timestamp is provided, it will update that message.
 	 * @param string $message
@@ -91,7 +91,7 @@ class BotClient
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Deletes a message the bot user has posted.
 	 * @param string $ts
@@ -107,7 +107,7 @@ class BotClient
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Identifies the channel ID from a given name. Rate limited by Slack.
 	 * @url https://api.slack.com/methods/channels.list
@@ -128,7 +128,7 @@ class BotClient
 			return $cl[$branding][$bob]['id'];
 		}
 	}
-	
+
 	/**
 	 * Pin the specified timestamp message to the chat.
 	 * @param string $ts
@@ -137,7 +137,7 @@ class BotClient
 	{
 		return $this->pinModifier($ts, 'add');
 	}
-	
+
 	/**
 	 * Pin the specified timestamp message to the chat.
 	 * @param string $ts
@@ -146,7 +146,7 @@ class BotClient
 	{
 		return $this->pinModifier($ts, 'remove');
 	}
-	
+
 	/**
 	 * React to the specified message. Needs to be a Slack code name, without colons.
 	 *
@@ -167,7 +167,15 @@ class BotClient
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Obtains client information.
+	 */
+	public function botInfo()
+	{
+		return $this->client->sendRequest('bots.info');
+	}
+
 	/**
 	 * Tests the Slack API. Normally replies with ok.
 	 */
@@ -175,7 +183,7 @@ class BotClient
 	{
 		return $this->client->sendRequest('api.test');
 	}
-	
+
 	private function pinModifier($ts, $state)
 	{
 		$response = $this->client->sendRequest("pins.{$state}", $this->channel, ['timestamp' => $ts]);
