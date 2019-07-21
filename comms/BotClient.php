@@ -130,6 +130,13 @@ class BotClient
 	}
 
 	/**
+	 * Gets a collection of channels from the Slack workspace.
+	 */
+	public function findChannels() {
+		return $this->client->sendRequest("channels.list", $this->channel, ['exclude_archived' => true]);
+	}
+
+	/**
 	 * Pin the specified timestamp message to the chat.
 	 * @param string $ts
 	 */
