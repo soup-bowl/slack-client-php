@@ -163,6 +163,9 @@ class BotClient
 	 */
 	public function react($ts, $emoji = 'thumbsup')
 	{
+		// Remove colon denominators if present.
+		$emoji = str_replace( ':', '', $emoji );
+
 		$response = $this->client->sendRequest("reactions.add", $this->channel, [
 			'name'      => $emoji,
 			'timestamp' => $ts
