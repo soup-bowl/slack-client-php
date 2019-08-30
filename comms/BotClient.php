@@ -133,7 +133,7 @@ class BotClient
 	 * Gets a collection of channels from the Slack workspace.
 	 */
 	public function findChannels() {
-		return $this->client->sendRequest("channels.list", $this->channel, ['exclude_archived' => true]);
+		return $this->client->sendRequest("conversations.list", $this->channel, ['exclude_archived' => true]);
 	}
 
 	/**
