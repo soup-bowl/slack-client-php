@@ -183,7 +183,7 @@ class BotClient
 	 */
 	public function botInfo()
 	{
-		return $this->client->sendRequest('bots.info');
+		return $this->client->sendRequest('bots.info', $this->channel);
 	}
 
 	/**
