@@ -185,6 +185,16 @@ class BotClient
 	{
 		return $this->client->sendRequest('bots.info', $this->channel);
 	}
+	
+	/**
+	 * Obtain bot user information.
+	 *
+	 * @return void
+	 */
+	public function aboutMe()
+	{
+		return $this->client->sendRequest('auth.test', $this->channel);
+	}
 
 	/**
 	 * Tests the Slack API. Normally replies with ok.
